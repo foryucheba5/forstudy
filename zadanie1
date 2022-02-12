@@ -1,0 +1,28 @@
+public static string NormalizeRequestParameters
+ (NameValueCollection parameters)
+{ var sb = new StringBuilder();
+ var list = new List<NameValuePair>();
+ foreach (var name in parameters.AllKeys)
+ { var value = Uri.EscapeDataString(parameters[name]);
+ var item = new NameValuePair { Name = name, Value = value };
+ // Ensure duplicates are not included
+ if (list.Contains(item))
+ { throw new ArgumentException(
+ "Cannot add duplicate parameters");
+ }
+ list.Add(item);
+ }
+ list.Sort((left, right) =>
+ { if (left.Name.Equals(right.Name))
+ { return left.Value.CompareTo(right.Value);
+ }
+ return left.Name.CompareTo(right.Name);
+ });
+ foreach (var item in list)
+ { sb.Append(item.Name + "=" + item.Value);
+ if (list.IndexOf(item) < list.Count - 1)
+ { sb.Append("&");
+ }
+ }
+ return sb.ToString();
+}
